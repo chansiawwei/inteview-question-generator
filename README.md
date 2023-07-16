@@ -28,9 +28,9 @@ The Interview Question Generator relies on the following technologies:
 
 ## Usage
 
+```bash
 1. Install the required dependencies by running the following command:
 
-```bash
 pip install -r requirements.txt
 
 2. Run The App
