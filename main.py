@@ -90,7 +90,8 @@ def validate_form(person_name, webpages):
 response_types = {
     'Interview Questions' : """
         I will send you a webpage which include the job description.Your goal is to generate possible interview questions based on a job description listed on a webpage the user input.
-        Please respond with list of a few interview questions based on the job description. Please list at least 20 question in the response.
+        Please respond with list of a few interview questions based on the job description. Please list the 20 questions leave one line break in between each question. 
+        Do not format the response in numbered list.
     """,
 }
 
@@ -180,4 +181,11 @@ if button_ind:
                         })
 
         st.markdown(f"#### Output:")
-        st.write(output['output_text'])
+         # Remove leading and trailing whitespace from the output text
+        formatted_output = output['output_text'].strip()
+
+        # Split the generated interview questions and join them back with a line break in between
+        interview_questions = formatted_output.split('\n')
+        formatted_output = "\n".join([f"- {question}" for question in interview_questions])
+
+        st.write(formatted_output)
