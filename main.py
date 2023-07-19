@@ -75,6 +75,16 @@ def split_text(user_information):
 
     return docs
 
+# Function to validate the form fields
+def validate_form(person_name, webpages):
+    if not person_name:
+        st.error("Please enter the Person's Name.")
+        return False
+    if not webpages:
+        st.error("Please enter at least one Web Page URL.")
+        return False
+    return True
+
 # Prompts - We'll do a dynamic prompt based on the option the users selects
 # We'll hold different instructions in this dictionary below
 response_types = {
@@ -143,29 +153,31 @@ button_ind = st.button("*Generate Output*", type='secondary', help="Click to gen
 
 # Checking to see if the button_ind is true. If so, this means the button was clicked and we should process the links
 if button_ind:
-    website_data = get_content_from_urls(parse_urls(webpages), pull_from_website) if webpages else ""
-    user_information = "\n".join([website_data])
+    # Validate the form fields before proceeding
+    if validate_form(person_name, webpages):
+        website_data = get_content_from_urls(parse_urls(webpages), pull_from_website) if webpages else ""
+        user_information = "\n".join([website_data])
 
-    user_information_docs = split_text(user_information)
+        user_information_docs = split_text(user_information)
 
-    # Calls the function above
-    llm = load_LLM(openai_api_key=OPENAI_API_KEY)
+        # Calls the function above
+        llm = load_LLM(openai_api_key=OPENAI_API_KEY)
 
-    chain = load_summarize_chain(llm,
-                                 chain_type="map_reduce",
-                                 map_prompt=map_prompt_template,
-                                 combine_prompt=combine_prompt_template,
-                                 # verbose=True
-                                 )
-    
-    st.write("Sending request to LLM...")
-    st.write("Be back with a list of question")
+        chain = load_summarize_chain(llm,
+                                    chain_type="map_reduce",
+                                    map_prompt=map_prompt_template,
+                                    combine_prompt=combine_prompt_template,
+                                    # verbose=True
+                                    )
+        
+        st.write("Sending request to LLM...")
+        st.write("Be back with a list of question")
 
-    # Here we will pass our user information we gathered, the persons name and the response type from the radio button
-    output = chain({"input_documents": user_information_docs, # The seven docs that were created before
-                    "persons_name": person_name,
-                    "response_type" : response_types['Interview Questions']
-                    })
+        # Here we will pass our user information we gathered, the persons name and the response type from the radio button
+        output = chain({"input_documents": user_information_docs, # The seven docs that were created before
+                        "persons_name": person_name,
+                        "response_type" : response_types['Interview Questions']
+                        })
 
-    st.markdown(f"#### Output:")
-    st.write(output['output_text'])
+        st.markdown(f"#### Output:")
+        st.write(output['output_text'])
